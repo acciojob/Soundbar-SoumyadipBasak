@@ -1,4 +1,3 @@
-//your JS code here. If required.
 // List of sound files present in the "sounds" directory.
 // Update these names to match your actual files (e.g., "sound1.mp3", "sound2.mp3", etc.)
 const soundFiles = [
@@ -7,8 +6,7 @@ const soundFiles = [
   { name: "gasp",  file: "sounds/gasp.mp3" },
   { name: "ta-da", file: "sounds/tada.mp3" },
   { name: "victory", file: "sounds/victory.mp3" },
-  { name: "wrong", file: "sounds/wrong.mp3" },
-  { name: "stop", file: "sounds/stop.mp3" } // optional extra; you can omit if not needed
+  { name: "wrong", file: "sounds/wrong.mp3" }
 ];
 
 // Create a single Audio element to manage playback.

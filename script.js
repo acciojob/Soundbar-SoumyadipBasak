@@ -12,12 +12,16 @@ const soundFiles = [
 let currentAudio = null;
 
 /**
- * Stops the currently playing audio.
+ * Stops the currently playing audio and removes it from the DOM.
  */
 function stopAll() {
   if (currentAudio) {
     currentAudio.pause();
-    currentAudio.currentTime = 0; // Reset to the beginning
+    currentAudio.currentTime = 0;
+    
+    // FIX: Remove the element from the DOM
+    currentAudio.remove(); 
+    
     currentAudio = null;
   }
 }
@@ -33,14 +37,21 @@ function playSound(file) {
   currentAudio = new Audio(file);
   currentAudio.volume = 1.0;
 
-  // Add an event listener to clear the reference when the sound ends naturally
+  // FIX: Append the audio element to the DOM so testing tools (like Cypress) can find it.
+  currentAudio.classList.add('playing-audio-element');
+  document.body.appendChild(currentAudio);
+
   currentAudio.addEventListener("ended", () => {
-    currentAudio = null;
+    // FIX: Cleanup by removing the element from the DOM when finished
+    if (currentAudio) {
+      currentAudio.remove();
+      currentAudio = null;
+    }
   });
 
   // Start playback
   currentAudio.play().catch((err) => {
-    console.error(`Playback of ${file} failed:`, err);
+    console.error("Playback failed:", err);
   });
 }
 
@@ -58,7 +69,7 @@ function initButtons() {
     const btn = document.createElement("button");
     // Instruction requirement: class name as 'btn'
     btn.className = "btn";
-    // Capitalize the first letter for display
+    // Capitalize the first letter for better display
     btn.textContent = s.name.charAt(0).toUpperCase() + s.name.slice(1); 
     btn.dataset.sound = s.file;
 

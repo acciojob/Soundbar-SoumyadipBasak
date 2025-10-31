@@ -1,5 +1,4 @@
 // List of sound files present in the "sounds" directory.
-// Update these names to match your actual files (e.g., "sound1.mp3", "sound2.mp3", etc.)
 const soundFiles = [
   { name: "applause", file: "sounds/applause.mp3" },
   { name: "boo", file: "sounds/boo.mp3" },
@@ -9,60 +8,69 @@ const soundFiles = [
   { name: "wrong", file: "sounds/wrong.mp3" }
 ];
 
-// Create a single Audio element to manage playback.
+// Variable to hold the currently playing Audio object.
 let currentAudio = null;
 
-// Initialize the UI: create a button for each sound
+/**
+ * Stops the currently playing audio.
+ */
+function stopAll() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0; // Reset to the beginning
+    currentAudio = null;
+  }
+}
+
+/**
+ * Plays a specific sound file, stopping any current playback first.
+ * @param {string} file - The path to the audio file.
+ */
+function playSound(file) {
+  stopAll(); // Stop any currently playing sound
+
+  // Create a new Audio object for the selected file
+  currentAudio = new Audio(file);
+  currentAudio.volume = 1.0;
+
+  // Add an event listener to clear the reference when the sound ends naturally
+  currentAudio.addEventListener("ended", () => {
+    currentAudio = null;
+  });
+
+  // Start playback
+  currentAudio.play().catch((err) => {
+    console.error(`Playback of ${file} failed:`, err);
+  });
+}
+
+/**
+ * Dynamically creates the sound buttons and attaches click listeners.
+ */
 function initButtons() {
   const container = document.getElementById("buttons");
   if (!container) return;
 
-  // Create a button for each sound in the list
+  // Create a button for each sound
   soundFiles.forEach((s) => {
-    // Skip if file path is not defined
     if (!s.file) return;
 
     const btn = document.createElement("button");
+    // Instruction requirement: class name as 'btn'
     btn.className = "btn";
-    btn.textContent = s.name;
+    // Capitalize the first letter for display
+    btn.textContent = s.name.charAt(0).toUpperCase() + s.name.slice(1); 
     btn.dataset.sound = s.file;
 
-    // On click, play the corresponding sound
+    // Attach click handler
     btn.addEventListener("click", () => playSound(s.file));
     container.appendChild(btn);
   });
 }
 
-// Play a specific sound. If another is playing, stop it first.
-function playSound(file) {
-  // Stop any current playback
-  stopAll();
-
-  // Create a new Audio object for this file
-  currentAudio = new Audio(file);
-  currentAudio.volume = 1.0;
-
-  currentAudio.addEventListener("ended", () => {
-    // Cleanup when finished
-    currentAudio = null;
-  });
-
-  currentAudio.play().catch((err) => {
-    // Handle autoplay restrictions or errors
-    console.error("Playback failed:", err);
-  });
-}
-
-// Stop playback of the current audio
-function stopAll() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
-  }
-}
-
-// Wire up the Stop button
+/**
+ * Wires up the click event for the dedicated Stop button.
+ */
 function initStopButton() {
   const stopBtn = document.getElementById("stopBtn");
   if (stopBtn) {
@@ -70,7 +78,7 @@ function initStopButton() {
   }
 }
 
-// Initialize everything after DOM is ready
+// Initialize everything after the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   initButtons();
   initStopButton();
